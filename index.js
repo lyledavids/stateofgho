@@ -70,7 +70,7 @@ client.on('interactionCreate', async (interaction) => {
         
         const query = `
         {
-            mintedToTreasuries(orderBy: timestamp, orderDirection: desc, first: 10) {
+            mintedToTreasuries(orderBy: timestamp, orderDirection: desc, first: 5) {
               id
               amount
               timestamp
@@ -80,22 +80,23 @@ client.on('interactionCreate', async (interaction) => {
     
         axios.post(mainnetEndpoint, { query })
             .then(response => {
-                const ss = response.data.mintedToTreasuries;
+                const ss = response.data.data.mintedToTreasuries;
+                //console.log(ss)
     
                 if (ss && ss.length > 0) {
-                    const stakersEmbed = new MessageEmbed()
+                    const mintsEmbed = new MessageEmbed()
                         .setColor('#0099ff')
                         .setTitle(`Recent Treasury Mints`);
     
                     ss.forEach(s => {
-                        stakersEmbed.addField("ID", s.account);
-                        stakersEmbed.addField("Amount", `${weiToReadable(s.amount)} GHO`);
-                        stakersEmbed.addField("Timestamp", s.timestamp);
+                        mintsEmbed.addField("ID", s.id);
+                        mintsEmbed.addField("Amount", `${weiToReadable(s.amount)} GHO`);
+                        mintsEmbed.addField("Timestamp", s.timestamp);
     
-                        stakersEmbed.addField("\u200B", "\u200B");
+                        //mintsEmbed.addField("\u200B", "\u200B");
                     });
     
-                    interaction.reply({ embeds: [stakersEmbed] });
+                    interaction.reply({ embeds: [mintsEmbed] });
                 } else {
                     interaction.reply({
                         content: "No recent mints found."
@@ -154,6 +155,7 @@ function weiToReadable(weiAmount) {
     const divisor = 10 ** decimals;
 
     const readableDaiAmount = parseFloat(weiAmount) / divisor;
+    console.log(readableDaiAmount)
     return readableDaiAmount.toFixed(2); // Return with correct decimal precision
 }
 
